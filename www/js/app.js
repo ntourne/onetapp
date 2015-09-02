@@ -6,7 +6,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $rootScope, $state, $location) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -19,26 +19,51 @@ angular.module('starter', ['ionic', 'starter.controllers'])
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+
+    // UI Router Authentication Check
+    $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
+      console.log(toState.data.authenticate);
+      if (toState.data.authenticate && !Parse.User.current()) {
+          $state.transitionTo("login");
+          event.preventDefault(); 
+      }
+    });    
+
   });
 })
 
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
 
-    .state('app', {
+  .state('login', {
+    url: '/login',
+    templateUrl: 'templates/home.html',
+    controller: 'LoginCtrl',
+    data: {
+      authenticate: false
+    }
+  })
+
+  .state('app', {
     url: '/app',
     abstract: true,
     templateUrl: 'templates/menu.html',
-    controller: 'AppCtrl'
+    controller: 'AppCtrl',
+    data: {
+      authenticate: true
+    }    
   })
 
   .state('app.search', {
-    url: '/search',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/search.html'
-      }
-    }
+      url: '/search',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/search.html'
+        }
+      },
+      data: {
+        authenticate: true
+      }    
   })
 
   .state('app.browse', {
@@ -47,27 +72,39 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         'menuContent': {
           templateUrl: 'templates/browse.html'
         }
-      }
-    })
-    .state('app.playlists', {
+      },
+      data: {
+        authenticate: true
+      }      
+  })
+  
+  .state('app.playlists', {
       url: '/playlists',
       views: {
         'menuContent': {
           templateUrl: 'templates/playlists.html',
           controller: 'PlaylistsCtrl'
         }
-      }
-    })
+      },
+      data: {
+        authenticate: true
+      }      
+  })
 
   .state('app.single', {
-    url: '/playlists/:playlistId',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/playlist.html',
-        controller: 'PlaylistCtrl'
-      }
-    }
+      url: '/playlists/:playlistId',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/playlist.html',
+          controller: 'PlaylistCtrl'
+        }
+      },
+      data: {
+          authenticate: true
+      }    
   });
+
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/playlists');
+  $urlRouterProvider.otherwise('/login');
+
 });
