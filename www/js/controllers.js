@@ -1,6 +1,6 @@
-angular.module('starter.controllers', [])
+angular.module('starter.controllers', ['ionic'])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout, $state, $ionicPopup) {
+.controller('AppCtrl', function($scope, $ionicModal, $timeout, $state, $localstorage, $ionicPopup) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -57,12 +57,12 @@ angular.module('starter.controllers', [])
      });    
   }
 
-  $scope.authUser = null;
+  console.log($scope.authUser);
 
 })
 
 
-.controller('LoginCtrl', function($scope, $state, $controller) {
+.controller('LoginCtrl', function($scope, $state, $controller, $localstorage) {
 
   $controller('AppCtrl', { $scope: $scope });
 
@@ -89,8 +89,11 @@ angular.module('starter.controllers', [])
             user.set("avatar", response.picture.data.url);
             user.save(null);
 
-            $scope.authUser = { fullname: response.name, avatar: response.picture.data.url };
-            console.log($scope.authUser);
+            $scope.authUser = $localstorage.setObject('authUser', user);
+          });
+
+          FB.api('/me/friends', {fields: 'name'}, function(response) {
+            console.log(response);
           });
 
           $state.transitionTo("app.search");
@@ -104,7 +107,29 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('PlaylistsCtrl', function($scope) {
+
+
+.controller('SearchCtrl', function($scope, $controller, $localstorage) {
+  
+  $controller('AppCtrl', { $scope: $scope });
+
+  $scope.authUser = $localstorage.getObject('authUser');
+  console.log("SearchCtrl");
+  console.log($scope.authUser);
+
+  $scope.playlists = [
+    { title: 'Reggae', id: 1 },
+    { title: 'Chill', id: 2 },
+    { title: 'Dubstep', id: 3 },
+    { title: 'Indie', id: 4 },
+    { title: 'Rap', id: 5 },
+    { title: 'Cowbell', id: 6 }
+  ];
+
+})
+
+.controller('PlaylistsCtrl', function($scope, $localstorage) {
+  $scope.authUser = localStorageService.get('authUser');
   $scope.playlists = [
     { title: 'Reggae', id: 1 },
     { title: 'Chill', id: 2 },

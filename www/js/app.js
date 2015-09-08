@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers'])
+angular.module('starter', ['ionic', 'starter.services', 'starter.controllers'])
 
 .run(function($ionicPlatform, $rootScope, $state, $location) {
   $ionicPlatform.ready(function() {
@@ -32,7 +32,7 @@ angular.module('starter', ['ionic', 'starter.controllers'])
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
   $stateProvider
 
   .state('login', {
@@ -58,7 +58,8 @@ angular.module('starter', ['ionic', 'starter.controllers'])
       url: '/search',
       views: {
         'menuContent': {
-          templateUrl: 'templates/search.html'
+          templateUrl: 'templates/search.html',
+          controller: 'SearchCtrl'
         }
       },
       data: {
@@ -106,5 +107,15 @@ angular.module('starter', ['ionic', 'starter.controllers'])
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/login');
+
+  // Enable cross domain calls
+  $httpProvider.defaults.useXDomain = true;
+
+  // Remove the header used to identify ajax call  that would prevent CORS from working
+  delete $httpProvider.defaults.headers.common['X-Requested-With'];
+
+    // Set api token
+  if (typeof window.localStorage['auth_token'] !== 'undefined')
+    $httpProvider.defaults.headers.common['Authtoken'] = window.localStorage['auth_token'];
 
 });
