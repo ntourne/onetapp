@@ -41,6 +41,15 @@ angular.module('starter.controllers', [])
   };
 })
 
+
+.controller('ServicesCtrl', function($scope) {
+  $scope.services = [
+    { name: 'Weather', params: {zipcode: 7000, city: 'Tandil'} },
+    { name: 'Dolar'}
+  ];
+})
+
+
 .controller('PlaylistsCtrl', function($scope) {
   $scope.playlists = [
     { title: 'Reggae', id: 1 },
